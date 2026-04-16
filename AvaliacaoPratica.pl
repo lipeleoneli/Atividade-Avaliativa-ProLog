@@ -60,3 +60,20 @@ aprovado(CM, [item(CM, _, _, Nota, Freq)|_]) :-
 
 aprovado(CM, [_|Resto]) :-
     aprovado(CM, Resto).    
+
+% Questão 2:
+% Nesse exercicio ele reusa o predicado usado na questao acima ('Aprovado')
+falta(RA, CC, OQUE) :-
+    curriculo(CC, ListaMaterias),
+    historico(RA, Historico),
+    faltantes(ListaMaterias, Historico, OQUE).
+
+faltantes([], _, []).
+faltantes([CM|Resto], Historico, ListaFinal) :-
+    aprovado(CM, Historico),
+    faltantes(Resto, Historico, ListaFinal).
+faltantes([CM|Resto], Historico, [Nome|ListaFinal]) :-
+    materia(CM, Nome, _),
+    faltantes(Resto, Historico, ListaFinal).
+
+% Questao 3:
