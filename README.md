@@ -111,15 +111,6 @@ concluiu(12909, 1).
 
 ---
 
-## 🧠 Regras de Aprovação
-
-Uma disciplina é considerada concluída se:
-
-* Nota ≥ 5.0
-* Frequência ≥ 0.75
-
----
-
 ## 👨‍💻 Contribuidores
 
 * Felipe Nonato Leoneli
@@ -130,6 +121,7 @@ Uma disciplina é considerada concluída se:
 ## 📌 Status do Projeto
 
 ✔️ Questão 1 implementada
+✔️ Questão 2 implementada
 🔄 Demais funcionalidades em desenvolvimento
 
 ---
