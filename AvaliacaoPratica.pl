@@ -76,4 +76,56 @@ faltantes([CM|Resto], Historico, [Nome|ListaFinal]) :-
     materia(CM, Nome, _),
     faltantes(Resto, Historico, ListaFinal).
 
-% Questao 3:
+
+% Questão 3: extra(RA, CC, QUAIS)
+
+% Pega todos os itens do histórico e filtra os que são extra-curriculares
+extra(RA, CC, QUAIS) :-
+    historico(RA, Historico),
+    curriculo(CC, CurriculoCC),
+    extras_da_lista(Historico, CurriculoCC, QUAIS).
+
+% histórico vazio -> lista vazia
+extras_da_lista([], _, []).
+
+% Se a matéria do item NÃO está no currículo do curso,
+% ela é extra: pega o nome e coloca na lista
+extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, [Nome|ListaFinal]) :-
+    \+ membro(CM, Curriculo),
+    materia(CM, Nome, _),
+    extras_da_lista(Resto, Curriculo, ListaFinal).
+
+% Se a matéria DO item está no currículo, ignora e segue
+extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, ListaFinal) :-
+    membro(CM, Curriculo),
+    extras_da_lista(Resto, Curriculo, ListaFinal).
+
+% Predicado auxiliar: verifica se elemento pertence a lista
+membro(X, [X|_]).
+membro(X, [_|T]) :- membro(X, T).
+
+
+% Questão 4: jafoi(CC, RA, QUANTO)
+
+jafei(CC, RA, QUANTO) :-
+    curriculo(CC, ListaMaterias),
+    historico(RA, Historico),
+    conta_aprovadas(ListaMaterias, Historico, Aprovadas),
+    tamanho(ListaMaterias, Total),
+    QUANTO is (Aprovadas / Total) * 100.
+
+% Conta quantas matérias do currículo o aluno foi aprovado
+conta_aprovadas([], _, 0).
+conta_aprovadas([CM|Resto], Historico, N) :-
+    aprovado(CM, Historico),
+    conta_aprovadas(Resto, Historico, N1),
+    N is N1 + 1.
+conta_aprovadas([CM|Resto], Historico, N) :-
+    \+ aprovado(CM, Historico),
+    conta_aprovadas(Resto, Historico, N).
+
+% Calcula o tamanho de uma lista
+tamanho([], 0).
+tamanho([_|T], N) :-
+    tamanho(T, N1),
+    N is N1 + 1.
