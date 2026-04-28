@@ -33,8 +33,8 @@ historico(12909, [
     item(3,1,2023,6.0,0.80)
 ]).
 historico(12080, [
-    item(5,1,2022,6.0,0.70), % reprovado por freq
-    item(5,2,2023,7.5,0.90), % aprovado
+    item(5,1,2022,6.0,0.70),
+    item(5,2,2023,7.5,0.90),
     item(6,1,2023,5.0,0.90)
 ]).
 historico(12090, [
@@ -42,7 +42,23 @@ historico(12090, [
     item(8,2,2023,8.0,0.90)
 ]).
 
-% Questão 1:
+% AUXILIARES
+membro(X, [X|_]).
+membro(X, [_|T]) :- membro(X, T).
+
+tamanho([], 0).
+tamanho([_|T], N) :-
+    tamanho(T, N1),
+    N is N1 + 1.
+
+% APROVADO
+aprovado(CM, [item(CM,_,_,Nota,Freq)|_]) :-
+    Nota >= 5.0,
+    Freq >= 0.75.
+aprovado(CM, [_|Resto]) :-
+    aprovado(CM, Resto).
+
+% QUESTÃO 1: concluiu(RA, CC)
 concluiu(RA, CC) :-
     cursa(RA, CC),
     curriculo(CC, ListaMaterias),
@@ -54,15 +70,7 @@ todas_concluidas([CM|Resto], Historico) :-
     aprovado(CM, Historico),
     todas_concluidas(Resto, Historico).
 
-aprovado(CM, [item(CM, _, _, Nota, Freq)|_]) :-
-    Nota >= 5.0,
-    Freq >= 0.75.
-
-aprovado(CM, [_|Resto]) :-
-    aprovado(CM, Resto).    
-
-% Questão 2:
-% Nesse exercicio ele reusa o predicado usado na questao acima ('Aprovado')
+% QUESTÃO 2: falta(RA, CC, OQUE)
 falta(RA, CC, OQUE) :-
     curriculo(CC, ListaMaterias),
     historico(RA, Historico),
@@ -72,60 +80,37 @@ faltantes([], _, []).
 faltantes([CM|Resto], Historico, ListaFinal) :-
     aprovado(CM, Historico),
     faltantes(Resto, Historico, ListaFinal).
-faltantes([CM|Resto], Historico, [Nome|ListaFinal]) :-
+faltantes([CM|Resto], Historico, [Nome|ListaFinal]) :-  
+    \+ aprovado(CM, Historico),
     materia(CM, Nome, _),
     faltantes(Resto, Historico, ListaFinal).
 
-
-% Questão 3: extra(RA, CC, QUAIS)
-
-% Pega todos os itens do histórico e filtra os que são extra-curriculares
+% QUESTÃO 3: extra(RA, CC, QUAIS)
 extra(RA, CC, QUAIS) :-
     historico(RA, Historico),
     curriculo(CC, CurriculoCC),
     extras_da_lista(Historico, CurriculoCC, QUAIS).
 
-% histórico vazio -> lista vazia
 extras_da_lista([], _, []).
-
-% Se a matéria do item NÃO está no currículo do curso,
-% ela é extra: pega o nome e coloca na lista
 extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, [Nome|ListaFinal]) :-
     \+ membro(CM, Curriculo),
     materia(CM, Nome, _),
     extras_da_lista(Resto, Curriculo, ListaFinal).
-
-% Se a matéria DO item está no currículo, ignora e segue
 extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, ListaFinal) :-
     membro(CM, Curriculo),
     extras_da_lista(Resto, Curriculo, ListaFinal).
 
-% Predicado auxiliar: verifica se elemento pertence a lista
-membro(X, [X|_]).
-membro(X, [_|T]) :- membro(X, T).
-
-
-% Questão 4: jafoi(CC, RA, QUANTO)
-
-jafei(CC, RA, QUANTO) :-
+% QUESTÃO 4: jafoi(CC, RA, QUANTO)  
+jafoi(CC, RA, QUANTO) :-
     curriculo(CC, ListaMaterias),
     historico(RA, Historico),
     conta_aprovadas(ListaMaterias, Historico, Aprovadas),
     tamanho(ListaMaterias, Total),
     QUANTO is (Aprovadas / Total) * 100.
 
-% Conta quantas matérias do currículo o aluno foi aprovado
 conta_aprovadas([], _, 0).
-conta_aprovadas([CM|Resto], Historico, N) :-
-    aprovado(CM, Historico),
-    conta_aprovadas(Resto, Historico, N1),
-    N is N1 + 1.
-conta_aprovadas([CM|Resto], Historico, N) :-
-    \+ aprovado(CM, Historico),
-    conta_aprovadas(Resto, Historico, N).
+conta_aprovadas([CM|Resto], H, N) :-        
+    conta_aprovadas(Resto, H, N1),
+    (aprovado(CM, H) -> N is N1 + 1 ; N is N1).
 
-% Calcula o tamanho de uma lista
-tamanho([], 0).
-tamanho([_|T], N) :-
-    tamanho(T, N1),
-    N is N1 + 1.
+
