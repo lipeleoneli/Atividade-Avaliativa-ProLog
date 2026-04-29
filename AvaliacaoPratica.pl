@@ -43,53 +43,30 @@ historico(12090, [
 ]).
 
 % AUXILIARES
-membro(X, [X|_]).
-membro(X, [_|T]) :- membro(X, T).
-
-tamanho([], 0).
-tamanho([_|T], N) :-
-    tamanho(T, N1),
-    N is N1 + 1.
-
-% APROVADO
+% AUXILIARES Questao 1:
 aprovado(CM, [item(CM,_,_,Nota,Freq)|_]) :-
     Nota >= 5.0,
     Freq >= 0.75.
 aprovado(CM, [_|Resto]) :-
     aprovado(CM, Resto).
 
-% QUESTÃO 1: concluiu(RA, CC)
-concluiu(RA, CC) :-
-    cursa(RA, CC),
-    curriculo(CC, ListaMaterias),
-    historico(RA, Historico),
-    todas_concluidas(ListaMaterias, Historico).
-
 todas_concluidas([], _).
 todas_concluidas([CM|Resto], Historico) :-
     aprovado(CM, Historico),
     todas_concluidas(Resto, Historico).
 
-% QUESTÃO 2: falta(RA, CC, OQUE)
-falta(RA, CC, OQUE) :-
-    curriculo(CC, ListaMaterias),
-    historico(RA, Historico),
-    faltantes(ListaMaterias, Historico, OQUE).
-
+% AUXILIARES Questao 2:
 faltantes([], _, []).
 faltantes([CM|Resto], Historico, ListaFinal) :-
     aprovado(CM, Historico),
     faltantes(Resto, Historico, ListaFinal).
 faltantes([CM|Resto], Historico, [Nome|ListaFinal]) :-  
-    \+ aprovado(CM, Historico),
     materia(CM, Nome, _),
     faltantes(Resto, Historico, ListaFinal).
 
-% QUESTÃO 3: extra(RA, CC, QUAIS)
-extra(RA, CC, QUAIS) :-
-    historico(RA, Historico),
-    curriculo(CC, CurriculoCC),
-    extras_da_lista(Historico, CurriculoCC, QUAIS).
+% AUXILIARES Questao 3:
+membro(X, [X|_]).
+membro(X, [_|T]) :- membro(X, T).
 
 extras_da_lista([], _, []).
 extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, [Nome|ListaFinal]) :-
@@ -100,6 +77,36 @@ extras_da_lista([item(CM,_,_,_,_)|Resto], Curriculo, ListaFinal) :-
     membro(CM, Curriculo),
     extras_da_lista(Resto, Curriculo, ListaFinal).
 
+% AUXILIARES Questao 4:
+conta_aprovadas([], _, 0).
+conta_aprovadas([CM|Resto], H, N) :-        
+    conta_aprovadas(Resto, H, N1),
+    (aprovado(CM, H) -> N is N1 + 1 ; N is N1).
+
+tamanho([], 0).
+tamanho([_|T], N) :-
+    tamanho(T, N1),
+    N is N1 + 1.
+
+% QUESTÃO 1: concluiu(RA, CC)
+concluiu(RA, CC) :-
+    cursa(RA, CC),
+    curriculo(CC, ListaMaterias),
+    historico(RA, Historico),
+    todas_concluidas(ListaMaterias, Historico).
+
+% QUESTÃO 2: falta(RA, CC, OQUE)
+falta(RA, CC, OQUE) :-
+    curriculo(CC, ListaMaterias),
+    historico(RA, Historico),
+    faltantes(ListaMaterias, Historico, OQUE).
+
+% QUESTÃO 3: extra(RA, CC, QUAIS)
+extra(RA, CC, QUAIS) :-
+    historico(RA, Historico),
+    curriculo(CC, CurriculoCC),
+    extras_da_lista(Historico, CurriculoCC, QUAIS).
+
 % QUESTÃO 4: jafoi(CC, RA, QUANTO)  
 jafoi(CC, RA, QUANTO) :-
     curriculo(CC, ListaMaterias),
@@ -107,10 +114,3 @@ jafoi(CC, RA, QUANTO) :-
     conta_aprovadas(ListaMaterias, Historico, Aprovadas),
     tamanho(ListaMaterias, Total),
     QUANTO is (Aprovadas / Total) * 100.
-
-conta_aprovadas([], _, 0).
-conta_aprovadas([CM|Resto], H, N) :-        
-    conta_aprovadas(Resto, H, N1),
-    (aprovado(CM, H) -> N is N1 + 1 ; N is N1).
-
-
