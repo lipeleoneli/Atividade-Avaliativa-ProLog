@@ -97,6 +97,7 @@ concluiu(RA, CC) :-
 
 % QUESTÃO 2: falta(RA, CC, OQUE)
 falta(RA, CC, OQUE) :-
+    cursa(RA, CC),
     curriculo(CC, ListaMaterias),
     historico(RA, Historico),
     faltantes(ListaMaterias, Historico, OQUE).
@@ -109,6 +110,7 @@ extra(RA, CC, QUAIS) :-
 
 % QUESTÃO 4: jafoi(CC, RA, QUANTO)  
 jafoi(CC, RA, QUANTO) :-
+    cursa(RA, CC),
     curriculo(CC, ListaMaterias),
     historico(RA, Historico),
     conta_aprovadas(ListaMaterias, Historico, Aprovadas),
